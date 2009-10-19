@@ -22,9 +22,9 @@ module RTeX
     # [+:tmpdir+] Location of temporary directory (default: +Dir.tmpdir+)
     def self.options
       @options ||= {
-        :preprocessor => 'latex',
-        :preprocess => false,
-        :processor => 'pdflatex',
+        :preprocessor => 'xelatex',
+        :preprocess => true,
+        :processor => 'xelatex',
         # 
         :shell_redirect => nil,
         # Temporary Directory
@@ -117,13 +117,13 @@ module RTeX
     end
     
     def process!
-      unless `#{processor} --interaction=nonstopmode '#{source_file}' #{@options[:shell_redirect]}`
+      unless `#{processor} --interaction=nonstopmode -shell-escape '#{source_file}' #{@options[:shell_redirect]}`
         raise GenerationError, "Could not generate PDF using #{processor}"      
       end
     end
     
     def preprocess!
-      unless `#{preprocessor} --interaction=nonstopmode '#{source_file}' #{@options[:shell_redirect]}`
+      unless `#{preprocessor} --interaction=nonstopmode -shell-escape '#{source_file}' #{@options[:shell_redirect]}`
         raise GenerationError, "Could not preprocess using #{preprocessor}"      
       end
     end
