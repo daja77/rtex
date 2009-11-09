@@ -37,7 +37,17 @@ module RTeX
             options ||= {}
             ::RTeX::Document.new(result, options.merge(:processed => true)).to_pdf do |filename|
               serve_file = Tempfile.new('rtex-pdf')
-              FileUtils.mv filename, serve_file.path
+	      # background option should provide a background pdf to be printed on the generated pdf for ci styles etc.
+	      if options[:background]
+                outputfilename="out.pdf"
+                system("pdftk "+filename+" background "+options[:background]+" output "+outputfilename)
+		#overwriting the original generated document with the new one that has the background
+                outputpath=File.split(filename)
+                FileUtils.cp outputpath[0]+"/"+outputfilename, outputpath[0]+"/"+outputpath[1]
+                FileUtils.cp filename, serve_file.path
+	      else
+                FileUtils.cp filename, serve_file.path
+	      end
               send_file serve_file.path,
                 :disposition => (options[:disposition] rescue nil) || 'inline',
                 :url_based_filename => true,
